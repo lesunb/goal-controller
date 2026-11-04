@@ -7,7 +7,6 @@ import {
   useIstarDefaultNaming,
   type NodeOf,
 } from '@goal-controller/goal-tree';
-import type { SleecGoalProps, SleecTaskProps } from './types';
 
 /**
  * Allowed keys for SLEEC goal custom properties
@@ -55,27 +54,54 @@ export type SleecGoalKey = (typeof SLEEC_GOAL_KEYS)[number];
 export type SleecTaskKey = (typeof SLEEC_TASK_KEYS)[number];
 export type SleecQualityKey = (typeof SLEEC_QUALITY_KEYS)[number];
 
+/** An object with only the given keys, each optional. */
+type OptionalProps<K extends string> = { [P in K]?: string };
+
+/** An object with only the given keys, each required. */
+type RequiredProps<K extends string> = { [P in K]: string };
+
 /** A SLEEC element's properties as the mapper is given them: each `text`. */
-type SleecRecord<K extends string> = {
-  props: Partial<Record<K, string | null>>;
-  raw: Partial<Record<K, string>>;
+type SleecProps<K extends string> = {
+  props: { [P in K]?: string | null };
+  raw: { [P in K]?: string };
 };
 
 /**
  * The keys set, each as written: a key whose `text` reads as unset (empty
  * or blank) is left out, and the others keep their text untrimmed, as the
- * specification has always been given them.
+ * specification has always been given them. `R` is the record's own key
+ * range; `K`, the (possibly narrower) keys asked for, is what the result is
+ * typed by.
  */
-const written = <K extends string>(
-  { props, raw }: SleecRecord<K>,
+export const written = <R extends string, K extends R>(
+  { props, raw }: SleecProps<R>,
   keys: readonly K[],
-): Partial<Record<K, string>> => {
-  const values: Partial<Record<K, string>> = {};
+): OptionalProps<K> => {
+  const values: OptionalProps<K> = {};
   for (const key of keys) {
     const value = props[key] == null ? undefined : raw[key];
     if (value !== undefined) values[key] = value;
   }
   return values;
+};
+
+/**
+ * The keys set, each required: throws for a record missing one of `keys`.
+ */
+const required = <R extends string, K extends R>(
+  record: SleecProps<R>,
+  keys: readonly K[],
+  taskName: string,
+): RequiredProps<K> => {
+  const values = written(record, keys);
+  const missing = keys.filter((key) => !(key in values));
+  if (missing.length > 0) {
+    throw new Error(
+      `Task "${taskName}" is missing required SLEEC properties: ${missing.join(', ')}. ` +
+        `All tasks must define: ${keys.join(', ')}.`,
+    );
+  }
+  return values as RequiredProps<K>;
 };
 
 const REQUIRED_TASK_KEYS = [
@@ -85,36 +111,25 @@ const REQUIRED_TASK_KEYS = [
   'TemporalConstraint',
 ] as const;
 
-const extractSleecTaskProps = (
-  record: SleecRecord<SleecTaskKey>,
-  taskName: string,
-): SleecTaskProps => {
-  const values = written(record, REQUIRED_TASK_KEYS);
-  const { PreCond, TriggeringEvent, PostCond, TemporalConstraint } = values;
-  if (
-    PreCond === undefined ||
-    TriggeringEvent === undefined ||
-    PostCond === undefined ||
-    TemporalConstraint === undefined
-  ) {
-    const missing = REQUIRED_TASK_KEYS.filter((key) => !(key in values));
-    throw new Error(
-      `Task "${taskName}" is missing required SLEEC properties: ${missing.join(', ')}. ` +
-        `All tasks must define: ${REQUIRED_TASK_KEYS.join(', ')}.`,
-    );
-  }
+export type RequiredTaskKey = (typeof REQUIRED_TASK_KEYS)[number];
 
+/** Each SLEEC goal (and Quality) key, optional. */
+export type SleecGoalProps = OptionalProps<SleecGoalKey>;
+
+/** A task's properties: the mapper throws for a task missing one of the four required. */
+export type SleecTaskProps = RequiredProps<RequiredTaskKey> &
+  /** the event that stops the task (goal-controller#230: key as the seeds write it) */
+  OptionalProps<'ObstacleEvent'>;
+
+const extractSleecTaskProps = (
+  record: SleecProps<SleecTaskKey>,
+  taskName: string,
+): SleecTaskProps => ({
+  ...required(record, REQUIRED_TASK_KEYS, taskName),
   // an ObstacleEvent is set as every other key is: a blank one is unset, and
   // no rule _5 is written for it (#225, #230)
-  const { ObstacleEvent } = written(record, ['ObstacleEvent'] as const);
-  return {
-    PreCond,
-    TriggeringEvent,
-    PostCond,
-    TemporalConstraint,
-    ...(ObstacleEvent && { ObstacleEvent }),
-  };
-};
+  ...written(record, ['ObstacleEvent'] as const),
+});
 
 /**
  * SLEEC Engine Mapper for creating SLEEC-compatible goal trees: the iStar

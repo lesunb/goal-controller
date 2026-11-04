@@ -1,26 +1,6 @@
 /**
  * SLEEC Engine Types
- * Types for SLEEC template engine properties
+ * Types for SLEEC template engine properties, derived in mapper.ts from
+ * the dialect's literal property keys.
  */
-
-export type SleecGoalProps = {
-  Type?: string;
-  Source?: string;
-  Class?: string;
-  NormPrinciple?: string;
-  Proxy?: string;
-  AddedValue?: string;
-  Condition?: string;
-  Event?: string;
-  ContextEvent?: string;
-};
-
-/** A task's properties: the mapper throws for a task missing one of the four required. */
-export type SleecTaskProps = {
-  PreCond: string;
-  TriggeringEvent: string;
-  TemporalConstraint: string;
-  PostCond: string;
-  /** the event that stops the task (goal-controller#230: key as the seeds write it) */
-  ObstacleEvent?: string;
-};
+export type { SleecGoalProps, SleecTaskProps } from './mapper';

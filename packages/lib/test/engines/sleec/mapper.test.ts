@@ -2,6 +2,8 @@ import * as assert from 'assert';
 import { describe, it } from 'mocha';
 import { GoalTree, Model } from '@goal-controller/goal-tree';
 import { sleecEngineMapper } from '../../../src/engines/sleec';
+import { written } from '../../../src/engines/sleec/mapper';
+import type { SleecTaskProps } from '../../../src/engines/sleec/types';
 
 describe('sleecEngineMapper', () => {
   it('carries NormPrinciple and Proxy from a Quality, not other goal keys', () => {
@@ -34,5 +36,28 @@ describe('sleecEngineMapper', () => {
       NormPrinciple: 'Autonomy',
       Proxy: 'Assent/Consent',
     });
+  });
+
+  it('types its props by their literal keys (compile-time)', () => {
+    const taskProps: SleecTaskProps = {
+      PreCond: 'p',
+      TriggeringEvent: 't',
+      TemporalConstraint: 'c',
+      PostCond: 'q',
+    };
+    assert.ok(taskProps);
+    // @ts-expect-error a required SLEEC task key can't be undefined
+    const _missingRequired: SleecTaskProps['PreCond'] = undefined;
+    void _missingRequired;
+
+    const record = {
+      props: { Proxy: 'x', Type: 'y' },
+      raw: { Proxy: 'x', Type: 'y' },
+    };
+    const narrowed = written(record, ['Proxy'] as const);
+    assert.strictEqual(narrowed.Proxy, 'x');
+    // @ts-expect-error `written` narrows its result to the keys asked for, not the record's whole key range
+    const _extra = narrowed.Type;
+    void _extra;
   });
 });
