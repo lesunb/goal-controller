@@ -22,7 +22,7 @@
       "id": "PMA",
       "text": "PMA",
       "type": "istar.Actor",
-      "x": 322,
+      "x": 87,
       "y": 58,
       "customProperties": {},
       "nodes": [
