@@ -8,7 +8,7 @@
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_ActorUI" xmi:id="Patient-figure" x="-11" y="223" core="Patient"/>
     </Diagram>
     <Diagram xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GoalDiagram" name="PMA" xmi:id="PMA-diagram" phase="LR" Actor="PMA">
-      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_ActorUI" xmi:id="PMA-figure" x="322" y="58" core="PMA" children="followInstructions-figure eatMeals-figure takeMedicine-figure takeMedicineNoDinner-figure callAssistant-figure rememberSpeakers-figure"/>
+      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_ActorUI" xmi:id="PMA-figure" x="87" y="58" core="PMA" children="followInstructions-figure eatMeals-figure takeMedicine-figure takeMedicineNoDinner-figure callAssistant-figure rememberSpeakers-figure"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_HardGoalUI" xmi:id="followInstructions-figure" x="464" y="128" width="225" height="37" core="followInstructions" container="PMA-figure"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_HardGoalUI" xmi:id="eatMeals-figure" x="434" y="245" width="87" height="36" core="eatMeals" container="PMA-figure"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_HardGoalUI" xmi:id="takeMedicine-figure" x="606" y="313" width="126" height="49" core="takeMedicine" container="PMA-figure"/>
@@ -19,7 +19,7 @@
     <Diagram xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:ActorDiagram" name="Actor diagram" xmi:id="actor-diagram" phase="ER">
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_ActorUI" xmi:id="CareAssistant-actor-figure" x="3" y="38" core="CareAssistant"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_ActorUI" xmi:id="Patient-actor-figure" x="-11" y="223" core="Patient"/>
-      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_ActorUI" xmi:id="PMA-actor-figure" x="322" y="58" core="PMA"/>
+      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_ActorUI" xmi:id="PMA-actor-figure" x="87" y="58" core="PMA"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_HardGoalUI" xmi:id="followInstructionsDependum-figure" x="138" y="15" width="225" height="36" core="followInstructionsDependum"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_SoftGoalUI" xmi:id="reduceNeed-figure" x="124" y="72" width="129" height="57" core="reduceNeed"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_SoftGoalUI" xmi:id="noAnnoyances-figure" x="32" y="140" width="213" height="31" core="noAnnoyances"/>

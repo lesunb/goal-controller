@@ -5,7 +5,7 @@
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_ActorUI" xmi:id="Stakeholder-figure" x="37" y="59" core="Stakeholder"/>
     </Diagram>
     <Diagram xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GoalDiagram" name="Cleaner Agent" xmi:id="CleanerAgent-diagram" phase="LR" Actor="CleanerAgent">
-      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_ActorUI" xmi:id="CleanerAgent-figure" x="324" y="53" core="CleanerAgent" children="RC-figure MBL-figure WC-figure DC-figure mop-figure sweep-figure loadBattery-figure efficiency-figure"/>
+      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_ActorUI" xmi:id="CleanerAgent-figure" x="288" y="53" core="CleanerAgent" children="RC-figure MBL-figure WC-figure DC-figure mop-figure sweep-figure loadBattery-figure efficiency-figure"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_HardGoalUI" xmi:id="RC-figure" x="393" y="141" width="132" height="42" core="RC" container="CleanerAgent-figure"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_HardGoalUI" xmi:id="MBL-figure" x="576" y="168" width="150" height="66" core="MBL" container="CleanerAgent-figure"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.goaldiagram:GD_HardGoalUI" xmi:id="WC-figure" x="288" y="263" width="144" height="48" core="WC" container="CleanerAgent-figure"/>
@@ -17,7 +17,7 @@
     </Diagram>
     <Diagram xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:ActorDiagram" name="Actor diagram" xmi:id="actor-diagram" phase="ER">
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_ActorUI" xmi:id="Stakeholder-actor-figure" x="37" y="59" core="Stakeholder"/>
-      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_ActorUI" xmi:id="CleanerAgent-actor-figure" x="324" y="53" core="CleanerAgent"/>
+      <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_ActorUI" xmi:id="CleanerAgent-actor-figure" x="288" y="53" core="CleanerAgent"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_HardGoalUI" xmi:id="RoomCleanDependum-figure" x="128" y="24" width="135" height="48" core="RoomCleanDependum"/>
       <DiagramNodes xsi:type="it.itc.sra.taom4e.model.diagram.actordiagram:AD_SoftGoalUI" xmi:id="efficiencyDependum-figure" x="148" y="110" width="117" height="45" core="efficiencyDependum"/>
     </Diagram>
