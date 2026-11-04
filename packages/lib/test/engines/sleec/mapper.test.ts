@@ -3,7 +3,10 @@ import { describe, it } from 'mocha';
 import { GoalTree, Model } from '@goal-controller/goal-tree';
 import { sleecEngineMapper } from '../../../src/engines/sleec';
 import { written } from '../../../src/engines/sleec/mapper';
-import type { SleecTaskProps } from '../../../src/engines/sleec/types';
+import type {
+  SleecGoalProps,
+  SleecTaskProps,
+} from '../../../src/engines/sleec/mapper';
 
 describe('sleecEngineMapper', () => {
   it('carries NormPrinciple and Proxy from a Quality, not other goal keys', () => {
@@ -49,6 +52,12 @@ describe('sleecEngineMapper', () => {
     // @ts-expect-error a required SLEEC task key can't be undefined
     const _missingRequired: SleecTaskProps['PreCond'] = undefined;
     void _missingRequired;
+
+    const goalProps: SleecGoalProps = { Type: 'Achieve' };
+    assert.ok(goalProps);
+    // @ts-expect-error a goal's props have only the nine SLEEC goal keys
+    const _notAGoalKey: SleecGoalProps = { NotAKey: 'x' };
+    void _notAGoalKey;
 
     const record = {
       props: { Proxy: 'x', Type: 'y' },

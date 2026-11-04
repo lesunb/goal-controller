@@ -19,10 +19,9 @@ export {
   type SleecGoalKey,
   type SleecTaskKey,
   type SleecQualityKey,
+  type SleecGoalProps,
+  type SleecTaskProps,
 } from './mapper';
-
-// Types
-export type { SleecGoalProps, SleecTaskProps } from './types';
 
 // Transformation (template engine)
 export { sleecTemplateEngine, sleecOutput, extractMeasures } from './template';
