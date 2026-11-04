@@ -3,9 +3,9 @@ import { describe, it } from 'mocha';
 import { generatePurposes } from '../../../../src/engines/sleec/template/purposes';
 import type {
   SleecGoalNode,
+  SleecGoalProps,
   SleecGoalTree,
 } from '../../../../src/engines/sleec/mapper';
-import type { SleecGoalProps } from '../../../../src/engines/sleec/types';
 
 /**
  * Helper to create a minimal goal node (an `istar.Goal`) with sleec props

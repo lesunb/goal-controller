@@ -2,75 +2,38 @@
  * SLEEC Engine Mapper
  * Maps raw iStar model properties to SLEEC engine-specific properties
  */
+import { propertyKeys } from '@goal-controller/dialect';
+import type { PropertyList } from '@goal-controller/goal-language';
 import {
   createEngineMapper,
   useIstarDefaultNaming,
   type NodeOf,
+  type PropsOf,
 } from '@goal-controller/goal-tree';
-import type { SleecGoalProps, SleecTaskProps } from './types';
+import { sleec } from './definition';
 
-/**
- * Allowed keys for SLEEC goal custom properties
- */
-export const SLEEC_GOAL_KEYS = [
-  'Type',
-  'Source',
-  'Class',
-  'NormPrinciple',
-  'Proxy',
-  'AddedValue',
-  'Condition',
-  'Event',
-  'ContextEvent',
-] as const;
-
-/**
- * Allowed keys for SLEEC task custom properties. The seeds write
- * `ObstacleEvent` (goal-controller#230); `FluentName` is documentation only.
- */
-export const SLEEC_TASK_KEYS = [
-  'PreCond',
-  'TriggeringEvent',
-  'TemporalConstraint',
-  'PostCond',
-  'ObstacleEvent',
-] as const;
-
-/**
- * Allowed keys for SLEEC Quality custom properties (also in SLEEC_GOAL_KEYS).
- * Examples put NormPrinciple/Proxy on the Quality "Autonomy".
- */
-export const SLEEC_QUALITY_KEYS = ['NormPrinciple', 'Proxy'] as const;
-
-/** SLEEC's properties, as goal-tree reads them: each key's value is text. */
-const texts = <K extends string>(keys: readonly K[]) =>
-  keys.map((key) => ({
-    key,
-    value: { type: 'text' as const },
-    help: `its SLEEC ${key}`,
-  }));
+// the custom properties it reads, per kind: from the engine's definition
+export const SLEEC_GOAL_KEYS = propertyKeys(sleec, 'goal');
+export const SLEEC_TASK_KEYS = propertyKeys(sleec, 'task');
+export const SLEEC_QUALITY_KEYS = propertyKeys(sleec, 'quality');
 
 // Type aliases for the allowed keys
 export type SleecGoalKey = (typeof SLEEC_GOAL_KEYS)[number];
 export type SleecTaskKey = (typeof SLEEC_TASK_KEYS)[number];
 export type SleecQualityKey = (typeof SLEEC_QUALITY_KEYS)[number];
 
-/** A SLEEC element's properties as the mapper is given them: each `text`. */
-type SleecRecord<K extends string> = {
-  props: Partial<Record<K, string | null>>;
-  raw: Partial<Record<K, string>>;
-};
-
 /**
  * The keys set, each as written: a key whose `text` reads as unset (empty
  * or blank) is left out, and the others keep their text untrimmed, as the
- * specification has always been given them.
+ * specification has always been given them. `L` is the record's own
+ * property list; `K`, the (possibly narrower) keys asked for, is what the
+ * result is typed by.
  */
-const written = <K extends string>(
-  { props, raw }: SleecRecord<K>,
+export const written = <L extends PropertyList, K extends L[number]['key']>(
+  { props, raw }: PropsOf<L>,
   keys: readonly K[],
-): Partial<Record<K, string>> => {
-  const values: Partial<Record<K, string>> = {};
+) => {
+  const values: { [P in K]?: string } = {};
   for (const key of keys) {
     const value = props[key] == null ? undefined : raw[key];
     if (value !== undefined) values[key] = value;
@@ -85,35 +48,21 @@ const REQUIRED_TASK_KEYS = [
   'TemporalConstraint',
 ] as const;
 
-const extractSleecTaskProps = (
-  record: SleecRecord<SleecTaskKey>,
+/** The keys set, each required: throws for a record missing one of `keys`. */
+const required = <L extends PropertyList, K extends L[number]['key']>(
+  record: PropsOf<L>,
+  keys: readonly K[],
   taskName: string,
-): SleecTaskProps => {
-  const values = written(record, REQUIRED_TASK_KEYS);
-  const { PreCond, TriggeringEvent, PostCond, TemporalConstraint } = values;
-  if (
-    PreCond === undefined ||
-    TriggeringEvent === undefined ||
-    PostCond === undefined ||
-    TemporalConstraint === undefined
-  ) {
-    const missing = REQUIRED_TASK_KEYS.filter((key) => !(key in values));
+) => {
+  const values = written(record, keys);
+  const missing = keys.filter((key) => !(key in values));
+  if (missing.length > 0) {
     throw new Error(
       `Task "${taskName}" is missing required SLEEC properties: ${missing.join(', ')}. ` +
-        `All tasks must define: ${REQUIRED_TASK_KEYS.join(', ')}.`,
+        `All tasks must define: ${keys.join(', ')}.`,
     );
   }
-
-  // an ObstacleEvent is set as every other key is: a blank one is unset, and
-  // no rule _5 is written for it (#225, #230)
-  const { ObstacleEvent } = written(record, ['ObstacleEvent'] as const);
-  return {
-    PreCond,
-    TriggeringEvent,
-    PostCond,
-    TemporalConstraint,
-    ...(ObstacleEvent && { ObstacleEvent }),
-  };
+  return values as { [P in K]: string };
 };
 
 /**
@@ -124,26 +73,24 @@ const extractSleecTaskProps = (
 export const sleecEngineMapper = createEngineMapper({
   // no definition, no notation: goal texts give their ids and names only;
   // its properties are its keys, as text
-  dialect: {
-    name: 'SLEEC',
-    properties: {
-      goal: texts(SLEEC_GOAL_KEYS),
-      task: texts(SLEEC_TASK_KEYS),
-      quality: texts(SLEEC_QUALITY_KEYS),
-    },
-  },
+  dialect: sleec,
   naming: useIstarDefaultNaming(),
   elements: (entry) => [
-    // a quality is given its kind's keys only (NormPrinciple, Proxy)
     entry({
       kinds: ['istar.Goal', 'istar.Quality'],
-      mapProps: ({ props, raw }): SleecGoalProps =>
+      // a Quality's own properties (NormPrinciple, Proxy) are a subset of a
+      // Goal's: read it as a Goal, each of its other keys then unset
+      mapProps: ({ props, raw }: PropsOf<typeof sleec.properties.goal>) =>
         written({ props, raw }, SLEEC_GOAL_KEYS),
     }),
     entry({
       kind: 'istar.Task',
-      mapProps: ({ props, raw, name }) =>
-        extractSleecTaskProps({ props, raw }, name),
+      mapProps: ({ props, raw, name }) => ({
+        ...required({ props, raw }, REQUIRED_TASK_KEYS, name),
+        // an ObstacleEvent is set as every other key is: a blank one is
+        // unset, and no rule _5 is written for it (#225, #230)
+        ...written({ props, raw }, ['ObstacleEvent'] as const),
+      }),
     }),
   ],
   ignore: ['istar.Resource'],
@@ -154,3 +101,8 @@ export type SleecNode = NodeOf<typeof sleecEngineMapper>;
 export type SleecGoalNode = Extract<SleecNode, { type: 'goal' }>;
 export type SleecTask = Extract<SleecNode, { type: 'task' }>;
 export type SleecGoalTree = SleecNode[];
+
+/** Each SLEEC goal (and Quality) key, optional. */
+export type SleecGoalProps = SleecGoalNode['properties']['engine'];
+/** A task's properties: the mapper throws for a task missing one of the four required. */
+export type SleecTaskProps = SleecTask['properties']['engine'];
